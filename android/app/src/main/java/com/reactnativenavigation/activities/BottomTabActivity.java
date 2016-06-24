@@ -57,7 +57,7 @@ public class BottomTabActivity extends BaseReactActivity implements AHBottomNavi
         mContentFrame = (FrameLayout) findViewById(R.id.contentFrame);
 
         final ArrayList<Screen> screens = (ArrayList<Screen>) getIntent().getSerializableExtra(EXTRA_SCREENS);
-        Drawer drawer = (Drawer) getIntent().getSerializableExtra(DRAWER_PARAMS);
+        final Drawer drawer = (Drawer) getIntent().getSerializableExtra(DRAWER_PARAMS);
         mBottomNavigation.setForceTint(true);
         setupDrawer(drawer, screens.get(0));
         setupTabs(getIntent().getExtras());

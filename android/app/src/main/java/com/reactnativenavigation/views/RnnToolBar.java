@@ -53,7 +53,6 @@ public class RnnToolBar extends Toolbar {
     private Drawable mBackground;
     private Drawable mDrawerIcon;
     private Screen mDrawerScreen;
-    private Integer mButtonsTintColor;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<View> mMenuItems;
@@ -243,8 +242,8 @@ public class RnnToolBar extends Toolbar {
 
         if (navArrow != null) {
             navArrow.setProgress(isBack ? 1.0f : 0.0f);
-            if (mButtonsTintColor != null) {
-                navArrow.setColor(mButtonsTintColor);
+            if (screen.navBarButtonColor != null) {
+                navArrow.setColor(screen.navBarButtonColor);
             } else {
                 navArrow.setColor(Color.BLACK);
             }

@@ -188,6 +188,24 @@ function setupDrawer(drawerParams) {
   return drawer;
 }
 
+function setupDrawer(drawerParams) {
+  const drawer = Object.assign({}, drawerParams);
+  [drawer.left, drawer.right].forEach(side => {
+    if (!side) {
+      return;
+    }
+    const icon = resolveAssetSource(side.icon);
+    if (icon) {
+      side.icon = icon.uri;
+    }
+  });
+  if (drawer.disableOpenGesture === undefined) {
+    drawer.disableOpenGesture = false;
+  };
+
+  return drawer;
+}
+
 export default {
   startTabBasedApp,
   startSingleScreenApp,
