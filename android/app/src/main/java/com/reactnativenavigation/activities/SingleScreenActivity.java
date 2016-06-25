@@ -19,8 +19,6 @@ public class SingleScreenActivity extends BaseReactActivity {
 
     private String mNavigatorId;
     private ScreenStack mScreenStack;
-    private ScreenStack mDrawerStack;
-    private DrawerLayout mDrawerLayout;
 
     @Override
     protected void handleOnCreate() {

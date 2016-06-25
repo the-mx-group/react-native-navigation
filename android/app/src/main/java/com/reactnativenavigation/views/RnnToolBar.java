@@ -82,8 +82,6 @@ public class RnnToolBar extends Toolbar {
     }
 
     public void setStyle(Screen screen) {
-        mButtonsTintColor = screen.navBarButtonColor;
-
         if (screen.toolBarColor != null) {
             setBackgroundColor(screen.toolBarColor);
         } else {
