@@ -114,7 +114,6 @@ public class BottomTabActivity extends BaseReactActivity implements AHBottomNavi
 
     @Override
     public void push(Screen screen) {
-        super.push(screen);
         for (ScreenStack stack : mScreenStacks) {
             if (stack.peek().navigatorId.equals(screen.navigatorId)) {
                 stack.push(screen);
@@ -125,7 +124,6 @@ public class BottomTabActivity extends BaseReactActivity implements AHBottomNavi
 
     @Override
     public Screen pop(String navigatorId) {
-        super.pop(navigatorId);
         for (ScreenStack stack: mScreenStacks) {
             if (stack.peek().navigatorId.equals(navigatorId)) {
                 Screen popped = stack.pop();
@@ -138,7 +136,6 @@ public class BottomTabActivity extends BaseReactActivity implements AHBottomNavi
 
     @Override
     public Screen popToRoot(String navigatorId) {
-        super.popToRoot(navigatorId);
         for (ScreenStack stack: mScreenStacks) {
             if (stack.peek().navigatorId.equals(navigatorId)) {
                 Screen popped = stack.popToRoot();
@@ -159,8 +156,8 @@ public class BottomTabActivity extends BaseReactActivity implements AHBottomNavi
         return mScreenStacks != null ? mScreenStacks.get(mCurrentStackPosition).peek() : null;
     }
 
+    @Override
     public Screen resetTo(Screen screen) {
-        super.resetTo(screen);
         StyleHelper.updateStyles(mToolbar, screen);
         return mScreenStacks.get(mCurrentStackPosition).resetTo(screen);
     }
@@ -191,13 +188,6 @@ public class BottomTabActivity extends BaseReactActivity implements AHBottomNavi
 
         mCurrentStackPosition = position;
         StyleHelper.updateStyles(mToolbar, getCurrentScreen());
-
-        // Hide or show back button if needed
-        if (getScreenStackSize() > 1) {
-            mToolbar.setNavUpButton(getCurrentScreen());
-        } else {
-            mToolbar.setNavUpButton();
-        }
     }
 
     @Override

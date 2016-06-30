@@ -226,7 +226,8 @@ public class RnnToolBar extends Toolbar {
             return;
         }
 
-        boolean isBack = screen != null;
+        BaseReactActivity activity = (BaseReactActivity) getContext();
+        boolean isBack = activity.getScreenStackSize() > 1;
         boolean hasDrawer = mDrawerToggle != null;
 
         Drawable navIcon = null;
@@ -246,7 +247,7 @@ public class RnnToolBar extends Toolbar {
             if (screen != null && screen.navBarButtonColor != null) {
                 navArrow.setColor(screen.navBarButtonColor);
             } else {
-                navArrow.setColor(mButtonColor);
+                navArrow.setColor(Color.BLACK);
             }
             navIcon = navArrow;
         }

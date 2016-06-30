@@ -14,6 +14,7 @@ import com.reactnativenavigation.views.ScreenStack;
  * Created by guyc on 05/04/16.
  */
 public class SingleScreenActivity extends BaseReactActivity {
+
     public static final String DRAWER_PARAMS = "drawerParams";
     public static final String EXTRA_SCREEN = "extraScreen";
 
@@ -56,14 +57,12 @@ public class SingleScreenActivity extends BaseReactActivity {
 
     @Override
     public void push(Screen screen) {
-        super.push(screen);
         mScreenStack.push(screen);
         StyleHelper.updateStyles(mToolbar, screen);
     }
 
     @Override
     public Screen pop(String navigatorId) {
-        super.pop(navigatorId);
         Screen popped = mScreenStack.pop();
         StyleHelper.updateStyles(mToolbar, getCurrentScreen());
         return popped;
@@ -71,15 +70,13 @@ public class SingleScreenActivity extends BaseReactActivity {
 
     @Override
     public Screen popToRoot(String navigatorId) {
-        super.popToRoot(navigatorId);
-        Screen screen = mScreenStack.popToRoot();
+        Screen popped = mScreenStack.popToRoot();
         StyleHelper.updateStyles(mToolbar, getCurrentScreen());
-        return screen;
+        return popped;
     }
 
     @Override
     public Screen resetTo(Screen screen) {
-        super.resetTo(screen);
         Screen popped = mScreenStack.resetTo(screen);
         StyleHelper.updateStyles(mToolbar, screen);
         return popped;
