@@ -56,7 +56,6 @@ public class RnnToolBar extends Toolbar {
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<View> mMenuItems;
-    private int mButtonColor;
 
     public RnnToolBar(Context context) {
         super(context);
@@ -83,8 +82,6 @@ public class RnnToolBar extends Toolbar {
     }
 
     public void setStyle(Screen screen) {
-        mButtonColor = (screen.navBarButtonColor != null) ? screen.navBarButtonColor : Color.BLACK;
-
         if (screen.toolBarColor != null) {
             setBackgroundColor(screen.toolBarColor);
         } else {
