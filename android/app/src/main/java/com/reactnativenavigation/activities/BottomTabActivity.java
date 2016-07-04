@@ -210,7 +210,13 @@ public class BottomTabActivity extends BaseReactActivity implements AHBottomNavi
     }
 
     public void switchToTab(ReadableMap params) {
-        int tabIndex = params.getInt(KEY_TAB_INDEX);
+        Integer tabIndex;
+        if (params.hasKey(KEY_TAB_INDEX)) {
+            tabIndex = params.getInt(KEY_TAB_INDEX);
+        } else {
+            final String navigatorId = params.getString(KEY_NAVIGATOR_ID);
+            tabIndex = findNavigatorTabIndex(navigatorId);
+        }
         mBottomNavigation.setCurrentItem(tabIndex);
     }
 
@@ -253,6 +259,17 @@ public class BottomTabActivity extends BaseReactActivity implements AHBottomNavi
         }
     }
 
+    protected Integer findNavigatorTabIndex(String navigatorId) {
+        for (int i = 0; i < mScreenStacks.size(); i++) {
+            ScreenStack stack = mScreenStacks.get(i);
+            if (!stack.isEmpty() && stack.peek().navigatorId.equals(navigatorId)) {
+                return i;
+            }
+        }
+
+        return null;
+    }
+
     private void setTabsWithIcons(ArrayList<Screen> screens, Map<Screen, Drawable> icons) {
         mScreenStacks = new ArrayList<>();
         for (Screen screen : screens) {
@@ -264,5 +281,13 @@ public class BottomTabActivity extends BaseReactActivity implements AHBottomNavi
             mBottomNavigation.setOnTabSelectedListener(this);
         }
         this.onTabSelected(0, false);
+    }
+
+
+    @Override
+    protected void removeAllReactViews() {
+        for (ScreenStack screenStack : mScreenStacks) {
+            screenStack.removeAllReactViews();
+        }
     }
 }

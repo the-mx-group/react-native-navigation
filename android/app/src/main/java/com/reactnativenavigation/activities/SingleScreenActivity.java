@@ -99,4 +99,9 @@ public class SingleScreenActivity extends BaseReactActivity {
     public int getScreenStackSize() {
         return mScreenStack.getStackSize();
     }
+
+    @Override
+    protected void removeAllReactViews() {
+        mScreenStack.removeAllReactViews();
+    }
 }

@@ -1,9 +1,7 @@
 package com.reactnativenavigation.views;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
@@ -11,7 +9,6 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -45,14 +42,11 @@ import java.util.Map;
  */
 public class RnnToolBar extends Toolbar {
 
-    private static final int ANIMATE_DURATION = 180;
-
     private List<Screen> mScreens;
     private AsyncTask mDrawerIconTask;
     private AsyncTask mSetupToolbarTask;
     private Drawable mBackground;
     private Drawable mDrawerIcon;
-    private Screen mDrawerScreen;
     private DrawerLayout mDrawerLayout;
     private ActionBarDrawerToggle mDrawerToggle;
     private ArrayList<View> mMenuItems;
@@ -121,7 +115,6 @@ public class RnnToolBar extends Toolbar {
         }
 
         mDrawerLayout = drawerLayout;
-        mDrawerScreen = drawerScreen;
         mDrawerToggle = new ActionBarDrawerToggle(
             ContextProvider.getActivityContext(),
             mDrawerLayout,
@@ -232,7 +225,7 @@ public class RnnToolBar extends Toolbar {
         if (hasDrawer && mDrawerIcon == null) {
             navArrow = (DrawerArrowDrawable) this.getNavigationIcon();
         } else {
-            if (isBack) {
+            if (isBack && !screen.backButtonHidden) {
                 navArrow = new DrawerArrowDrawable(ContextProvider.getActivityContext());
             } else if (hasDrawer) {
                 navIcon = mDrawerIcon;
@@ -318,7 +311,7 @@ public class RnnToolBar extends Toolbar {
             mOldButtons = oldScreen == null ? null : oldScreen.getButtons();
             mNewButtons = newScreen.getButtons();
             mTintColor = newScreen.navBarButtonColor;
-            mIconDimensions = (int) (toolBar.getHeight() * 0.4f);
+            mIconDimensions = (int) ImageUtils.convertDpToPixel(48, toolBar.getContext());
         }
 
         @Override
@@ -369,7 +362,7 @@ public class RnnToolBar extends Toolbar {
             for (int i = 0; i < size; i++) {
                 Button button = mNewButtons.get(i);
                 MenuItem item = menu.add(Menu.NONE, button.getItemId(), size - i - 1, button.title);
-                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+                item.setShowAsAction(getMenuItemShowAction(button.showAsAction));
 
                 // Set button icon
                 if (button.hasIcon()) {
@@ -420,6 +413,19 @@ public class RnnToolBar extends Toolbar {
 
                 toolBar.mSetupToolbarTask = null;
                 mToolbarWR.clear();
+            }
+        }
+
+        private int getMenuItemShowAction(String action) {
+            switch (action) {
+                case "never":
+                    return MenuItem.SHOW_AS_ACTION_NEVER;
+                case "always":
+                    return MenuItem.SHOW_AS_ACTION_ALWAYS;
+                case "withText":
+                    return MenuItem.SHOW_AS_ACTION_WITH_TEXT;
+                default:
+                    return MenuItem.SHOW_AS_ACTION_IF_ROOM;
             }
         }
     }

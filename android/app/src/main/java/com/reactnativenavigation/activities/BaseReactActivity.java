@@ -1,6 +1,9 @@
 package com.reactnativenavigation.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -26,6 +29,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.common.ReactConstants;
+import com.facebook.react.devsupport.DevServerHelper;
 import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.facebook.react.shell.MainReactPackage;
 import com.reactnativenavigation.BuildConfig;
@@ -55,6 +59,8 @@ public abstract class BaseReactActivity extends AppCompatActivity implements Def
     protected static final String KEY_TAB_INDEX = "tabIndex";
     protected static final String KEY_TITLE = "title";
     protected static final String KEY_TO = "to";
+    protected static final String KEY_NAVIGATOR_ID = "navigatorID";
+
     private static final String TAG = "BaseReactActivity";
     private static final String REDBOX_PERMISSION_MESSAGE =
             "Overlay permissions needs to be granted in order for react native apps to run in dev mode";
@@ -367,6 +373,15 @@ public abstract class BaseReactActivity extends AppCompatActivity implements Def
         }
         return super.onKeyUp(keyCode, event);
     }
+
+    /**
+     * Called after bundle was reloaded. This is a good chance to clean up previously connected react views.
+     */
+    public void onJSBundleReloaded() {
+        removeAllReactViews();
+    }
+
+    protected abstract void removeAllReactViews();
 
     @Override
     public void onBackPressed() {
