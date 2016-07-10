@@ -19,7 +19,6 @@ public class StyleHelper {
             toolBar.setNavUpButton(screen);
             toolBar.updateAndSetButtons(screen);
             setWindowStyle(screen);
-            toolBar.setupToolbarButtonsAsync(screen);
         } catch (Exception e) {
             Log.w("RNNavigation", "Tried to update styles with no screen!");
         }
