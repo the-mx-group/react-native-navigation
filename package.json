@@ -22,7 +22,7 @@
     "react": ">=0.14.5"
   },
   "dependencies": {
-    "react-native-controllers": "https://github.com/the-mx-group/react-native-controllers.git#f5874ae"
+    "react-native-controllers": "https://github.com/aksonov/react-native-controllers.git#b7fa033"
   },
   "optionalDependencies": {
     "react-redux": "*"
