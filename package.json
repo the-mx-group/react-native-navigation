@@ -22,7 +22,7 @@
     "react": ">=0.14.5"
   },
   "dependencies": {
-    "react-native-controllers": "https://github.com/aksonov/react-native-controllers.git#804a03f"
+    "react-native-ios-controllers": "https://github.com/aksonov/react-native-controllers.git#804a03f"
   },
   "optionalDependencies": {
     "react-redux": "*"
