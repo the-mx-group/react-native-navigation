@@ -30,7 +30,7 @@
     "react": ">=0.14.5"
   },
   "dependencies": {
-    "react-native-controllers": "^2.0.0",
+    "react-native-controllers": "https://github.com/wix/react-native-controllers.git#ff31832",
     "lodash": "^4.13.0",
     "babel-preset-react-native-stage-0": "^1.0.0"
   },
