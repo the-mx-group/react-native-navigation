@@ -36,10 +36,10 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
 
     private void createLayout() {
         if (sideMenuParams == null) {
-            createStack(this);
+            createStack(screenParams, this);
         } else {
             sideMenu = createSideMenu();
-            createStack(sideMenu.getContentContainer());
+            createStack(screenParams, sideMenu.getContentContainer());
         }
     }
 
@@ -50,17 +50,21 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
         return sideMenu;
     }
 
-    private void createStack(RelativeLayout parent) {
+    private void createStack(ScreenParams params, RelativeLayout parent) {
         if (stack != null) {
             stack.destroy();
         }
-        stack = new ScreenStack(activity, parent, screenParams.getNavigatorId(), this);
+        stack = new ScreenStack(activity, parent, params.getNavigatorId(), this);
         LayoutParams lp = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
-        pushInitialScreen(lp);
+        pushInitialScreen(params, lp);
     }
 
     protected void pushInitialScreen(LayoutParams lp) {
-        stack.pushInitialScreen(screenParams, lp);
+        pushInitialScreen(screenParams, lp);
+    }
+
+    private void pushInitialScreen(ScreenParams params, LayoutParams lp) {
+        stack.pushInitialScreen(params, lp);
         stack.show();
     }
 
@@ -105,7 +109,7 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
     @Override
     public void newStack(ScreenParams params) {
         RelativeLayout parent = sideMenu == null ? this : sideMenu.getContentContainer();
-        createStack(parent);
+        createStack(params, parent);
     }
 
     @Override
