@@ -5,7 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  Alert
+  Alert,
+  Platform
 } from 'react-native';
 import {connect} from 'react-redux';
 import * as counterActions from '../reducers/counter/actions';
@@ -22,7 +23,8 @@ class FirstTabScreen extends Component {
     tabSelectedTextColor: '#FFA000',
     tabNormalTextColor: '#FFC107',
     tabIndicatorColor: '#FFA000',
-    drawUnderTabBar: true
+    drawUnderTabBar: true,
+    navBarTextSubtitleColor: '#0060A0'
   };
 
   static navigatorButtons = {
@@ -109,53 +111,66 @@ class FirstTabScreen extends Component {
 
   render() {
     return (
-      <View style={{flex: 1, padding: 20}}>
+      <ScrollView>
+        <View style={{flex: 1, padding: 20}}>
 
-        <Text style={styles.text}>
-          <Text style={{fontWeight: '500'}}>Same Counter: </Text> {this.props.counter.count}
-        </Text>
+          <Text style={styles.text}>
+            <Text style={{fontWeight: '500'}}>Same Counter: </Text> {this.props.counter.count}
+          </Text>
 
-        <TouchableOpacity onPress={ this.onIncrementPress.bind(this) }>
-          <Text style={styles.button}>Increment Counter</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={ this.onIncrementPress.bind(this) }>
+            <Text style={styles.button}>Increment Counter</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={ this.onPushPress.bind(this) }>
-          <Text style={styles.button}>Push Screen</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={ this.onPushPress.bind(this) }>
+            <Text style={styles.button}>Push Screen</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={ this.onShowModalPress.bind(this) }>
-          <Text style={styles.button}>Modal Screen</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={ this.onShowModalPress.bind(this) }>
+            <Text style={styles.button}>Modal Screen</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={ this.onToggleNavBarPress.bind(this) }>
-          <Text style={styles.button}>Toggle NavBar</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={ this.onToggleNavBarPress.bind(this) }>
+            <Text style={styles.button}>Toggle NavBar</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={ this.onSetTitlePress.bind(this) }>
-          <Text style={styles.button}>Set Title</Text>
-        </TouchableOpacity>
+          {
+            Platform.OS === 'android' ?
+            <TouchableOpacity onPress={ this.onShowSnackbarPress.bind(this) }>
+              <Text style={styles.button}>Show Snackbar</Text>
+            </TouchableOpacity> : false
+          }
 
-        <TouchableOpacity onPress={ this.onSetOneButtonsPress.bind(this) }>
-          <Text style={styles.button}>Set One Buttons</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={ this.onSetTitlePress.bind(this) }>
+            <Text style={styles.button}>Set Title</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={ this.onSetTwoButtonsPress.bind(this) }>
-          <Text style={styles.button}>Set Two Buttons</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={ this.onSetSubtitlePress.bind(this) }>
+            <Text style={styles.button}>Set Subtitle</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={ this.onToggleDrawerPress.bind(this) }>
-          <Text style={styles.button}>Toggle Drawer</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={ this.onSetOneButtonsPress.bind(this) }>
+            <Text style={styles.button}>Set One Buttons</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={ this.onSelectSecondTabPress.bind(this) }>
-          <Text style={styles.button}>Select Second Tab</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={ this.onSetTwoButtonsPress.bind(this) }>
+            <Text style={styles.button}>Set Two Buttons</Text>
+          </TouchableOpacity>
 
-        <Text style={{fontWeight: '500'}}>String prop: {this.props.str}</Text>
-        <Text style={{fontWeight: '500'}}>Function prop: {this.props.fn ? this.props.fn() : ''}</Text>
-        {this.props.obj ? <Text style={{fontWeight: '500'}}>Object prop: {this.props.obj.str}</Text> : false}
-        {this.props.obj && this.props.obj.arr ? <Text style={{fontWeight: '500'}}>Array prop: {this.props.obj.arr[0].str}</Text> : false}
-      </View>
+          <TouchableOpacity onPress={ this.onToggleDrawerPress.bind(this) }>
+            <Text style={styles.button}>Toggle Drawer</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity onPress={ this.onSelectSecondTabPress.bind(this) }>
+            <Text style={styles.button}>Select Second Tab</Text>
+          </TouchableOpacity>
+
+          <Text style={{fontWeight: '500'}}>String prop: {this.props.str}</Text>
+          <Text style={{fontWeight: '500'}}>Function prop: {this.props.fn ? this.props.fn() : ''}</Text>
+          {this.props.obj ? <Text style={{fontWeight: '500'}}>Object prop: {this.props.obj.str}</Text> : false}
+          {this.props.obj && this.props.obj.arr ? <Text style={{fontWeight: '500'}}>Array prop: {this.props.obj.arr[0].str}</Text> : false}
+        </View>
+      </ScrollView>
     );
   }
 
@@ -210,8 +225,26 @@ class FirstTabScreen extends Component {
     });
   }
 
+  onShowSnackbarPress() {
+    this.props.navigator.showSnackbar({
+      text: 'Counter: ' + this.props.counter.count,
+      actionText: 'Undo',
+      actionColor: '#ff0000',
+      actionId: 'undo',
+      duration: 'indefinite'
+    });
+  }
+
   onSetTitlePress() {
-    this.props.navigator.setTitle(_.random(0, 100).toString());
+    this.props.navigator.setTitle({
+      title: 'Title ' + _.random(0, 100).toString()
+    });
+  }
+
+  onSetSubtitlePress() {
+    this.props.navigator.setSubTitle({
+      subtitle: 'Subtitle ' + _.random(0, 100).toString()
+    });
   }
 
   onSetOneButtonsPress() {

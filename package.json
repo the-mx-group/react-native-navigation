@@ -7,7 +7,7 @@
     "type": "git",
     "url": "https://github.com/wix/react-native-navigation.git"
   },
-  "version": "2.0.0-experimental.87",
+  "version": "2.0.0-experimental.91",
   "description": "React Native Navigation - truly native navigation for iOS and Android",
   "nativePackage": true,
   "bugs": {
@@ -26,8 +26,8 @@
     "release": "npm version prerelease && npm publish --tag next && npm view react-native-navigation dist-tags && git push"
   },
   "peerDependencies": {
-    "react-native": ">=0.25.1",
-    "react": ">=0.14.5"
+    "react-native": ">=0.31.0",
+    "react": ">=15.2.1"
   },
   "dependencies": {
     "react-native-controllers": "https://github.com/wix/react-native-controllers.git#ff31832",
@@ -38,8 +38,8 @@
     "react-redux": "*"
   },
   "devDependencies": {
-    "react-native": "0.25.1",
-    "react": "0.14.5",
+    "react-native": "0.31.0",
+    "react": "15.2.1",
     "app-root-path": "^1.0.0",
     "babel-cli": "^6.8.0",
     "babel-core": "^6.8.0",

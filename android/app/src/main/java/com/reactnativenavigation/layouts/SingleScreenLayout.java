@@ -5,17 +5,21 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.params.ScreenParams;
 import com.reactnativenavigation.params.SideMenuParams;
+import com.reactnativenavigation.params.SnackbarParams;
 import com.reactnativenavigation.params.TitleBarButtonParams;
 import com.reactnativenavigation.params.TitleBarLeftButtonParams;
 import com.reactnativenavigation.screens.ScreenStack;
 import com.reactnativenavigation.views.LeftButtonOnClickListener;
 import com.reactnativenavigation.views.SideMenu;
+import com.reactnativenavigation.views.SnackbarContainer;
 
 import java.util.List;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
+import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class SingleScreenLayout extends RelativeLayout implements Layout {
 
@@ -23,6 +27,7 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
     protected final ScreenParams screenParams;
     private final SideMenuParams sideMenuParams;
     protected ScreenStack stack;
+    private SnackbarContainer snackbarContainer;
     protected LeftButtonOnClickListener leftButtonOnClickListener;
     private @Nullable SideMenu sideMenu;
 
@@ -36,11 +41,16 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
 
     private void createLayout() {
         if (sideMenuParams == null) {
-            createStack(screenParams, this);
+            createStack(screenParams, getScreenStackParent());
         } else {
             sideMenu = createSideMenu();
-            createStack(screenParams, sideMenu.getContentContainer());
+            createStack(screenParams, getScreenStackParent());
         }
+        createSnackbarContainer();
+    }
+
+    private RelativeLayout getScreenStackParent() {
+        return sideMenu == null ? this : sideMenu.getContentContainer();
     }
 
     private SideMenu createSideMenu() {
@@ -68,6 +78,14 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
         stack.show();
     }
 
+    private void createSnackbarContainer() {
+        snackbarContainer = new SnackbarContainer(getContext());
+        RelativeLayout.LayoutParams lp = new LayoutParams(MATCH_PARENT, WRAP_CONTENT);
+        lp.addRule(ALIGN_PARENT_BOTTOM);
+        snackbarContainer.setLayoutParams(lp);
+        getScreenStackParent().addView(snackbarContainer);
+    }
+
     @Override
     public boolean onBackPressed() {
         if (stack.handleBackPressInJs()) {
@@ -85,6 +103,7 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
     @Override
     public void destroy() {
         stack.destroy();
+        snackbarContainer.destroy();
         if (sideMenu != null) {
             sideMenu.destroy();
         }
@@ -94,22 +113,26 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
     public void push(ScreenParams params) {
         LayoutParams lp = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         stack.push(params, lp);
+        snackbarContainer.onScreenChange();
     }
 
     @Override
     public void pop(ScreenParams params) {
         stack.pop(params.animateScreenTransitions);
+        snackbarContainer.onScreenChange();
     }
 
     @Override
     public void popToRoot(ScreenParams params) {
         stack.popToRoot(params.animateScreenTransitions);
+        snackbarContainer.onScreenChange();
     }
 
     @Override
     public void newStack(ScreenParams params) {
         RelativeLayout parent = sideMenu == null ? this : sideMenu.getContentContainer();
         createStack(params, parent);
+        snackbarContainer.onScreenChange();
     }
 
     @Override
@@ -120,6 +143,11 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
     @Override
     public void setTitleBarTitle(String screenInstanceId, String title) {
         stack.setScreenTitleBarTitle(screenInstanceId, title);
+    }
+
+    @Override
+    public void setTitleBarSubtitle(String screenInstanceId, String subtitle) {
+        stack.setScreenTitleBarSubtitle(screenInstanceId, subtitle);
     }
 
     @Override
@@ -153,6 +181,12 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
     }
 
     @Override
+    public void showSnackbar(SnackbarParams params) {
+        final String navigatorEventId = stack.peek().getNavigatorEventId();
+        snackbarContainer.showSnackbar(navigatorEventId, params);
+    }
+
+    @Override
     public boolean onTitleBarBackButtonClick() {
         if (leftButtonOnClickListener != null) {
             return leftButtonOnClickListener.onTitleBarBackButtonClick();
@@ -165,6 +199,9 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
     public void onSideMenuButtonClick() {
         if (sideMenu != null) {
             sideMenu.openDrawer();
+        } else {
+            final String navigatorEventId = stack.peek().getNavigatorEventId();
+            NavigationApplication.instance.sendNavigatorEvent("sideMenu", navigatorEventId);
         }
     }
 }

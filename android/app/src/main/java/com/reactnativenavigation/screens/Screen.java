@@ -132,12 +132,20 @@ public abstract class Screen extends RelativeLayout {
         return screenParams.getScreenInstanceId();
     }
 
+    public String getNavigatorEventId() {
+        return screenParams.getNavigatorEventId();
+    }
+
     public void setTopBarVisible(boolean visible, boolean animate) {
         topBarVisibilityAnimator.setVisible(visible, animate);
     }
 
     public void setTitleBarTitle(String title) {
         topBar.setTitle(title);
+    }
+
+    public void setTitleBarSubtitle(String subtitle) {
+        topBar.setSubtitle(subtitle);
     }
 
     public void setTitleBarRightButtons(String navigatorEventId, List<TitleBarButtonParams> titleBarButtons) {

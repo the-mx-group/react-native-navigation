@@ -115,6 +115,7 @@ function convertStyleParams(originalStyleObject) {
     topBarColor: originalStyleObject.navBarBackgroundColor,
     titleBarHidden: originalStyleObject.navBarHidden,
     titleBarTitleColor: originalStyleObject.navBarTextColor,
+    titleBarSubtitleColor: originalStyleObject.navBarTextSubtitleColor,
     titleBarButtonColor: originalStyleObject.navBarButtonColor,
     titleBarDisabledButtonColor: originalStyleObject.titleBarDisabledButtonColor,
     backButtonHidden: originalStyleObject.backButtonHidden,
@@ -251,6 +252,10 @@ function navigatorSetTabBadge(navigator, params) {
 
 function navigatorSetTitle(navigator, params) {
   newPlatformSpecific.setScreenTitleBarTitle(navigator.screenInstanceID, params.title);
+}
+
+function navigatorSetSubtitle(navigator, params) {
+  newPlatformSpecific.setScreenTitleBarSubtitle(navigator.screenInstanceID, params.subtitle);
 }
 
 function navigatorSwitchToTab(navigator, params) {
@@ -418,6 +423,10 @@ function addNavigationStyleParams(screen) {
   screen.navigatorStyle = Object.assign({}, screen.navigatorStyle, Screen.navigatorStyle);
 }
 
+function showSnackbar(navigator, params) {
+  return newPlatformSpecific.showSnackbar(params);
+}
+
 export default {
   startTabBasedApp,
   startSingleScreenApp,
@@ -431,8 +440,10 @@ export default {
   navigatorSetButtons,
   navigatorSetTabBadge,
   navigatorSetTitle,
+  navigatorSetSubtitle,
   navigatorSwitchToTab,
   navigatorToggleDrawer,
   navigatorToggleTabs,
-  navigatorToggleNavBar
+  navigatorToggleNavBar,
+  showSnackbar
 };
