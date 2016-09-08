@@ -40,6 +40,8 @@ function adaptTopTabs(screen, navigatorID) {
     if (navigatorID) {
       tab.navigatorID = navigatorID;
     }
+    tab.screen = tab.screenId;
+    addNavigatorButtons(tab);
     adaptNavigationParams(tab);
   });
 }
@@ -357,11 +359,42 @@ function addNavigatorButtons(screen, sideMenuParams) {
     }
   }
 
+  const fab = getFab(screen);
+  if (fab) {
+    screen.fab = fab;
+  }
+
   if (rightButtons) {
     screen.rightButtons = rightButtons;
   }
   if (leftButton) {
     screen.leftButton = leftButton;
+  }
+}
+
+function getFab(screen) {
+  if (screen.fab) {
+    const fab = screen.fab;
+    const collapsedIconUri = resolveAssetSource(fab.collapsedIcon);
+    if (!collapsedIconUri) {
+      return;
+    }
+    fab.collapsedIcon = collapsedIconUri.uri;
+    if (fab.expendedIcon) {
+      const expendedIconUri = resolveAssetSource(fab.expendedIcon);
+      if (expendedIconUri) {
+        fab.expendedIcon = expendedIconUri.ui;
+      }
+    }
+
+    if (fab.actions) {
+      _.forEach(fab.actions, (action) => {
+        action.icon = resolveAssetSource(action.icon).uri;
+        return action;
+      })
+    }
+
+    return fab;
   }
 }
 

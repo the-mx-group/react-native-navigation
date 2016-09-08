@@ -8,6 +8,8 @@ import android.widget.RelativeLayout;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.reactnativenavigation.NavigationApplication;
+import com.reactnativenavigation.events.EventBus;
+import com.reactnativenavigation.events.ScreenChangedEvent;
 import com.reactnativenavigation.params.ActivityParams;
 import com.reactnativenavigation.params.ScreenParams;
 import com.reactnativenavigation.params.SideMenuParams;
@@ -17,7 +19,7 @@ import com.reactnativenavigation.params.TitleBarLeftButtonParams;
 import com.reactnativenavigation.screens.ScreenStack;
 import com.reactnativenavigation.views.BottomTabs;
 import com.reactnativenavigation.views.SideMenu;
-import com.reactnativenavigation.views.SnackbarContainer;
+import com.reactnativenavigation.views.SnackbarAndFabContainer;
 
 import java.util.List;
 
@@ -28,7 +30,7 @@ public class BottomTabsLayout extends RelativeLayout implements Layout, AHBottom
 
     private final AppCompatActivity activity;
     private ActivityParams params;
-    private SnackbarContainer snackbarContainer;
+    private SnackbarAndFabContainer snackbarAndFabContainer;
     private BottomTabs bottomTabs;
     private ScreenStack[] screenStacks;
     private final SideMenuParams sideMenuParams;
@@ -100,15 +102,15 @@ public class BottomTabsLayout extends RelativeLayout implements Layout, AHBottom
     }
 
     private void createSnackbarContainer() {
-        snackbarContainer = new SnackbarContainer(getContext());
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT);
+        snackbarAndFabContainer = new SnackbarAndFabContainer(getContext());
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT);
         lp.addRule(ABOVE, bottomTabs.getId());
-        snackbarContainer.setLayoutParams(lp);
-        getScreenStackParent().addView(snackbarContainer);
+        getScreenStackParent().addView(snackbarAndFabContainer, lp);
     }
 
     private void showInitialScreenStack() {
         showStackAndUpdateStyle(screenStacks[0]);
+        EventBus.instance.post(new ScreenChangedEvent(screenStacks[0].peek().getScreenParams()));
     }
 
     @Override
@@ -125,6 +127,7 @@ public class BottomTabsLayout extends RelativeLayout implements Layout, AHBottom
         if (getCurrentScreenStack().canPop()) {
             getCurrentScreenStack().pop(true);
             setBottomTabsStyleFromCurrentScreen();
+            EventBus.instance.post(new ScreenChangedEvent(getCurrentScreenStack().peek().getScreenParams()));
             return true;
         } else {
             return false;
@@ -187,7 +190,12 @@ public class BottomTabsLayout extends RelativeLayout implements Layout, AHBottom
     @Override
     public void showSnackbar(SnackbarParams params) {
         final String eventId = getCurrentScreenStack().peek().getNavigatorEventId();
-        snackbarContainer.showSnackbar(eventId, params);
+        snackbarAndFabContainer.showSnackbar(eventId, params);
+    }
+
+    @Override
+    public void onModalDismissed() {
+        EventBus.instance.post(new ScreenChangedEvent(getCurrentScreenStack().peek().getScreenParams()));
     }
 
     public void selectBottomTabByTabIndex(Integer index) {
@@ -199,31 +207,31 @@ public class BottomTabsLayout extends RelativeLayout implements Layout, AHBottom
     }
 
     @Override
-    public void push(ScreenParams screenParams) {
-        ScreenStack screenStack = getScreenStack(screenParams.getNavigatorId());
-        screenStack.push(screenParams, createScreenLayoutParams(screenParams));
+    public void push(ScreenParams params) {
+        ScreenStack screenStack = getScreenStack(params.getNavigatorId());
+        screenStack.push(params, createScreenLayoutParams(params));
         if (isCurrentStack(screenStack)) {
-            bottomTabs.setStyleFromScreen(screenParams.styleParams);
+            bottomTabs.setStyleFromScreen(params.styleParams);
+            EventBus.instance.post(new ScreenChangedEvent(params));
         }
-        snackbarContainer.onScreenChange();
     }
 
     @Override
-    public void pop(ScreenParams screenParams) {
-        getCurrentScreenStack().pop(screenParams.animateScreenTransitions, new ScreenStack.OnScreenPop() {
+    public void pop(ScreenParams params) {
+        getCurrentScreenStack().pop(params.animateScreenTransitions, new ScreenStack.OnScreenPop() {
             @Override
             public void onScreenPopAnimationEnd() {
                 setBottomTabsStyleFromCurrentScreen();
             }
         });
-        snackbarContainer.onScreenChange();
+        EventBus.instance.post(new ScreenChangedEvent(getCurrentScreenStack().peek().getScreenParams()));
     }
 
     @Override
     public void popToRoot(ScreenParams params) {
         getCurrentScreenStack().popToRoot(params.animateScreenTransitions);
         setBottomTabsStyleFromCurrentScreen();
-        snackbarContainer.onScreenChange();
+        EventBus.instance.post(new ScreenChangedEvent(getCurrentScreenStack().peek().getScreenParams()));
     }
 
     @Override
@@ -238,12 +246,12 @@ public class BottomTabsLayout extends RelativeLayout implements Layout, AHBottom
         screenStacks[currentStackIndex] = newStack;
 
         bottomTabs.setStyleFromScreen(params.styleParams);
-        snackbarContainer.onScreenChange();
+        EventBus.instance.post(new ScreenChangedEvent(params));
     }
 
     @Override
     public void destroy() {
-        snackbarContainer.destroy();
+        snackbarAndFabContainer.destroy();
         for (ScreenStack screenStack : screenStacks) {
             screenStack.destroy();
         }
@@ -256,7 +264,7 @@ public class BottomTabsLayout extends RelativeLayout implements Layout, AHBottom
     public boolean onTabSelected(int position, boolean wasSelected) {
         hideCurrentStack();
         showNewStack(position);
-        snackbarContainer.onScreenChange();
+        EventBus.instance.post(new ScreenChangedEvent(getCurrentScreenStack().peek().getScreenParams()));
         return true;
     }
 
@@ -322,6 +330,7 @@ public class BottomTabsLayout extends RelativeLayout implements Layout, AHBottom
                 @Override
                 public void onScreenPopAnimationEnd() {
                     setBottomTabsStyleFromCurrentScreen();
+                    EventBus.instance.post(new ScreenChangedEvent(getCurrentScreenStack().peek().getScreenParams()));
                 }
             });
             return true;

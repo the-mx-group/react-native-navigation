@@ -9,6 +9,7 @@ import android.view.Window;
 import android.widget.RelativeLayout;
 
 import com.reactnativenavigation.animation.VisibilityAnimator;
+import com.reactnativenavigation.params.BaseScreenParams;
 import com.reactnativenavigation.params.ScreenParams;
 import com.reactnativenavigation.params.StyleParams;
 import com.reactnativenavigation.params.TitleBarButtonParams;
@@ -122,11 +123,7 @@ public abstract class Screen extends RelativeLayout {
         }
     }
 
-    public abstract void ensureUnmountOnDetachedFromWindow();
-
-    public abstract void preventUnmountOnDetachedFromWindow();
-
-    public abstract void preventMountAfterReattachedToWindow();
+    public abstract void unmountReactView();
 
     public String getScreenInstanceId() {
         return screenParams.getScreenInstanceId();
@@ -134,6 +131,10 @@ public abstract class Screen extends RelativeLayout {
 
     public String getNavigatorEventId() {
         return screenParams.getNavigatorEventId();
+    }
+
+    public BaseScreenParams getScreenParams() {
+        return screenParams;
     }
 
     public void setTopBarVisible(boolean visible, boolean animate) {

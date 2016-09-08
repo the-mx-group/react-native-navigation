@@ -13,7 +13,19 @@ public class Snakbar {
     private Snackbar snackbar;
 
     public interface OnDismissListener {
-        void onDismiss();
+        void onDismiss(Snakbar snakbar);
+    }
+
+    public void show() {
+        snackbar.show();
+    }
+
+    public void dismiss() {
+        snackbar.dismiss();
+    }
+
+    public View getView() {
+        return snackbar.getView();
     }
 
     public Snakbar(OnDismissListener parent, String navigatorEventId, SnackbarParams params) {
@@ -56,16 +68,8 @@ public class Snakbar {
 
             @Override
             public void onViewDetachedFromWindow(View v) {
-                parent.onDismiss();
+                parent.onDismiss(Snakbar.this);
             }
         });
-    }
-
-    public void show() {
-        snackbar.show();
-    }
-
-    public void dismiss() {
-        snackbar.dismiss();
     }
 }

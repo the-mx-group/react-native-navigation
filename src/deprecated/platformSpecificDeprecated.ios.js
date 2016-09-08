@@ -17,6 +17,7 @@ function startTabBasedApp(params) {
     return;
   }
 
+  const controllerID = _.uniqueId('controllerID');
   params.tabs.map(function(tab, index) {
     const navigatorID = controllerID + '_nav' + index;
     const screenInstanceID = _.uniqueId('screenInstanceID');
@@ -38,7 +39,6 @@ function startTabBasedApp(params) {
     };
   });
 
-  const controllerID = _.uniqueId('controllerID');
   const Controller = Controllers.createClass({
     render: function() {
       if (!params.drawer || (!params.drawer.left && !params.drawer.right)) {
@@ -151,6 +151,7 @@ function startSingleScreenApp(params) {
         <NavigationControllerIOS
           id={navigatorID}
           title={screen.title}
+          subtitle={params.subtitle}
           titleImage={screen.titleImage}
           component={screen.screen}
           passProps={{
@@ -216,10 +217,19 @@ function navigatorPush(navigator, params) {
   passProps.screenInstanceID = screenInstanceID;
   passProps.navigatorEventID = navigatorEventID;
 
+  params.navigationParams = {
+    screenInstanceID,
+    navigatorStyle,
+    navigatorButtons,
+    navigatorEventID,
+    navigatorID: navigator.navigatorID
+  };
+
   savePassProps(params);
 
   Controllers.NavigationControllerIOS(navigator.navigatorID).push({
     title: params.title,
+    subtitle:params.subtitle,
     titleImage: params.titleImage,
     component: params.screen,
     animated: params.animated,
@@ -260,10 +270,19 @@ function navigatorResetTo(navigator, params) {
   passProps.screenInstanceID = screenInstanceID;
   passProps.navigatorEventID = navigatorEventID;
 
+  params.navigationParams = {
+    screenInstanceID,
+    navigatorStyle,
+    navigatorButtons,
+    navigatorEventID,
+    navigatorID: navigator.navigatorID
+  };
+
   savePassProps(params);
 
   Controllers.NavigationControllerIOS(navigator.navigatorID).resetTo({
     title: params.title,
+    subtitle: params.subtitle,
     titleImage: params.titleImage,
     component: params.screen,
     animated: params.animated,
@@ -276,7 +295,10 @@ function navigatorResetTo(navigator, params) {
 
 function navigatorSetTitle(navigator, params) {
   Controllers.NavigationControllerIOS(navigator.navigatorID).setTitle({
-    title: params.title
+    title: params.title,
+    subtitle: params.subtitle,
+    titleImage: params.titleImage,
+    style: params.navigatorStyle
   });
 }
 
@@ -374,23 +396,33 @@ function showModal(params) {
     return;
   }
   const controllerID = _.uniqueId('controllerID');
+  const navigatorID = controllerID + '_nav';
+  const screenInstanceID = _.uniqueId('screenInstanceID');
+  const {
+    navigatorStyle,
+    navigatorButtons,
+    navigatorEventID
+  } = _mergeScreenSpecificSettings(params.screen, screenInstanceID, params);
+  const passProps = Object.assign({}, params.passProps);
+  passProps.navigatorID = navigatorID;
+  passProps.screenInstanceID = screenInstanceID;
+  passProps.navigatorEventID = navigatorEventID;
+
+  params.navigationParams = {
+    screenInstanceID,
+    navigatorStyle,
+    navigatorButtons,
+    navigatorEventID,
+    navigatorID: navigator.navigatorID
+  };
+
   const Controller = Controllers.createClass({
     render: function() {
-      const navigatorID = controllerID + '_nav';
-      const screenInstanceID = _.uniqueId('screenInstanceID');
-      const {
-        navigatorStyle,
-        navigatorButtons,
-        navigatorEventID
-      } = _mergeScreenSpecificSettings(params.screen, screenInstanceID, params);
-      const passProps = Object.assign({}, params.passProps);
-      passProps.navigatorID = navigatorID;
-      passProps.screenInstanceID = screenInstanceID;
-      passProps.navigatorEventID = navigatorEventID;
       return (
         <NavigationControllerIOS
           id={navigatorID}
           title={params.title}
+          subtitle={params.subtitle}
           titleImage={params.titleImage}
           component={params.screen}
           passProps={passProps}
@@ -433,6 +465,14 @@ function showLightBox(params) {
   passProps.screenInstanceID = screenInstanceID;
   passProps.navigatorEventID = navigatorEventID;
 
+  params.navigationParams = {
+    screenInstanceID,
+    navigatorStyle,
+    navigatorButtons,
+    navigatorEventID,
+    navigatorID
+  };
+
   savePassProps(params);
 
   Modal.showLightBox({
@@ -464,6 +504,14 @@ function showInAppNotification(params) {
   passProps.navigatorID = navigatorID;
   passProps.screenInstanceID = screenInstanceID;
   passProps.navigatorEventID = navigatorEventID;
+
+  params.navigationParams = {
+    screenInstanceID,
+    navigatorStyle,
+    navigatorButtons,
+    navigatorEventID,
+    navigatorID
+  };
 
   Notification.show({
     component: params.screen,
@@ -498,7 +546,7 @@ function savePassProps(params) {
 
   if (params.tabs) {
     _.forEach(params.tabs, (tab) => {
-      if(!tab.passProps) {
+      if (!tab.passProps) {
         tab.passProps = params.passProps;
       }
       savePassProps(tab);
