@@ -203,6 +203,11 @@ public class SingleScreenLayout extends RelativeLayout implements Layout {
     }
 
     @Override
+    public boolean containsNavigator(String navigatorId) {
+        return stack.getNavigatorId().equals(navigatorId);
+    }
+
+    @Override
     public boolean onTitleBarBackButtonClick() {
         if (leftButtonOnClickListener != null) {
             return leftButtonOnClickListener.onTitleBarBackButtonClick();

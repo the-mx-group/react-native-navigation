@@ -1,3 +1,4 @@
+/*eslint-disable*/
 import React, {Component} from 'react';
 import {AppRegistry, NativeModules} from 'react-native';
 import _ from 'lodash';
@@ -383,7 +384,7 @@ function getFab(screen) {
     if (fab.expendedIcon) {
       const expendedIconUri = resolveAssetSource(fab.expendedIcon);
       if (expendedIconUri) {
-        fab.expendedIcon = expendedIconUri.ui;
+        fab.expendedIcon = expendedIconUri.uri;
       }
     }
 

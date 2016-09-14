@@ -9,6 +9,7 @@ import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler;
 import com.reactnativenavigation.NavigationApplication;
 import com.reactnativenavigation.events.Event;
 import com.reactnativenavigation.events.EventBus;
+import com.reactnativenavigation.events.JsDevReloadEvent;
 import com.reactnativenavigation.events.ModalDismissedEvent;
 import com.reactnativenavigation.events.Subscriber;
 import com.reactnativenavigation.layouts.BottomTabsLayout;
@@ -20,12 +21,10 @@ import com.reactnativenavigation.params.SnackbarParams;
 import com.reactnativenavigation.params.TitleBarButtonParams;
 import com.reactnativenavigation.params.TitleBarLeftButtonParams;
 import com.reactnativenavigation.react.JsDevReloadHandler;
-import com.reactnativenavigation.react.ReactGateway;
-import com.reactnativenavigation.react.RedboxPermission;
 
 import java.util.List;
 
-public class NavigationActivity extends AppCompatActivity implements DefaultHardwareBackBtnHandler, ReactGateway.OnJsDevReloadListener, Subscriber {
+public class NavigationActivity extends AppCompatActivity implements DefaultHardwareBackBtnHandler, Subscriber {
 
     /**
      * Although we start multiple activities, we make sure to pass Intent.CLEAR_TASK | Intent.NEW_TASK
@@ -46,11 +45,9 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
         super.onCreate(savedInstanceState);
 
         if (!NavigationApplication.instance.isReactContextInitialized()) {
-            NavigationApplication.instance.startReactContext();
+            NavigationApplication.instance.startReactContextOnceInBackgroundAndExecuteJS();
             return;
         }
-
-        RedboxPermission.permissionToShowRedboxIfNeeded(this);
 
         activityParams = NavigationCommandsHandler.parseActivityParams(getIntent());
 
@@ -77,12 +74,12 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
     @Override
     protected void onResume() {
         super.onResume();
-        if (isFinishing()) {
+        if (isFinishing() || !NavigationApplication.instance.isReactContextInitialized()) {
             return;
         }
 
         currentActivity = this;
-        NavigationApplication.instance.getReactGateway().onResumeActivity(this, this, this);
+        NavigationApplication.instance.getReactGateway().onResumeActivity(this, this);
         EventBus.instance.register(this);
     }
 
@@ -117,12 +114,6 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
     }
 
     @Override
-    public void onJsDevReload() {
-        modalController.destroy();
-        layout.destroy();
-    }
-
-    @Override
     public void invokeDefaultOnBackPressed() {
         super.onBackPressed();
     }
@@ -145,7 +136,7 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
     }
 
     void push(ScreenParams params) {
-        if (modalController.isShowing()) {
+        if (modalController.containsNavigator(params.getNavigatorId())) {
             modalController.push(params);
         } else {
             layout.push(params);
@@ -153,7 +144,7 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
     }
 
     void pop(ScreenParams params) {
-        if (modalController.isShowing()) {
+        if (modalController.containsNavigator(params.getNavigatorId())) {
             modalController.pop(params);
         } else {
             layout.pop(params);
@@ -161,7 +152,7 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
     }
 
     void popToRoot(ScreenParams params) {
-        if (modalController.isShowing()) {
+        if (modalController.containsNavigator(params.getNavigatorId())) {
             modalController.popToRoot(params);
         } else {
             layout.popToRoot(params);
@@ -169,7 +160,7 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
     }
 
     void newStack(ScreenParams params) {
-        if (modalController.isShowing()) {
+        if (modalController.containsNavigator(params.getNavigatorId())) {
             modalController.newStack(params);
         } else {
             layout.newStack(params);
@@ -258,8 +249,11 @@ public class NavigationActivity extends AppCompatActivity implements DefaultHard
 
     @Override
     public void onEvent(Event event) {
-        if (event.getType() == ModalDismissedEvent.TYPE) {
+        if (event.getType().equals(ModalDismissedEvent.TYPE)) {
             layout.onModalDismissed();
+        } else if (event.getType().equals(JsDevReloadEvent.TYPE)) {
+            modalController.destroy();
+            layout.destroy();
         }
     }
 }
